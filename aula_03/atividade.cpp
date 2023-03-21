@@ -11,20 +11,27 @@
 
 #include <iostream>
 #include <new>
-#include <sstring>
+#include <sstream>
 #include <string>
 
 using namespace std;
 
-int let_int(const char * msg){
-	cout << msg << "\n";
+struct ErrodeEntrada{const char* msg;};
+
+int ler_int(const char * msg){
+	cout << msg;
 	
 	int i;
 
-	string linha; get_line(cin,linha);
+	string linha; getline(cin,linha);
 
-	istringstream origem;
+	istringstream origem(linha); origem >> i;
+
+	if(origem.fail()) throw ErrodeEntrada{"ler_int: Entrada não é valida"};
+
+	return i;
 }
+
 void copiar(int *v1, int *v2, int tam){
 	int* aux_v2 = v2;
 
@@ -49,24 +56,37 @@ void imprimir_vetor(int* v, int tam){
 int main(){
 
 	int tam = 1;
-	auto v1 = new int[tam];
 	int i;
 	int cont = 0;
 
+		auto v1 = new int[tam];
+
 	while(i != 0){
-		cout << "Entre um valor: ";
-		cin >> i;
+		try{
+			i = ler_int("Entre um valor: ");
+		}
+		catch (ErrodeEntrada &e){
+			cout << "Erro -> " << e.msg << "\n";
+			i = 0; cont = 0;
+		}
 
 		if(i != 0){
 			
 			if(cont == tam){
-				auto v2 = new int[tam*2];
-				copiar(v1,v2,tam);
+
+				try{
+					auto v2 = new int[tam*2];
+					copiar(v1,v2,tam);
 				
-				delete[] v1;
-				tam = tam*2;
-				
-				v1 = v2;
+					delete[] v1;
+					tam = tam*2;
+					
+					v1 = v2;
+				}
+
+				catch(const bad_alloc &e){
+					cont = -1;
+				}
 			}
 		
 			int j = cont-1;
@@ -83,6 +103,9 @@ int main(){
 			cont++;
 		}
 	}
+	
+	if(cont > 0) imprimir_vetor(v1,cont);
 
-	imprimir_vetor(v1,cont);
+	delete[] v1;
 }
+
