@@ -58,8 +58,17 @@ int main(){
 	int tam = 1;
 	int i;
 	int cont = 0;
+	int* v1;
 
-		auto v1 = new int[tam];
+	try {
+		v1 = new int[tam];
+	}
+	catch(const bad_alloc &e) {
+		cout << "Erro na alocação de mémoria do vetor (" 
+			<< e.what()
+			<< ")\n";
+		return -1;
+	}
 
 	while(i != 0){
 		try{
@@ -67,7 +76,7 @@ int main(){
 		}
 		catch (ErrodeEntrada &e){
 			cout << "Erro -> " << e.msg << "\n";
-			i = 0; cont = 0;
+			return -1;
 		}
 
 		if(i != 0){
@@ -85,7 +94,10 @@ int main(){
 				}
 
 				catch(const bad_alloc &e){
-					cont = -1;
+					cout << "Erro de alocacao de memoria do vetor(" 
+						<< e.what()
+						<<")\n";
+					return -1;
 				}
 			}
 		
