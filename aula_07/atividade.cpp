@@ -71,34 +71,26 @@ int particionar_hoare(T* v, int i, int f){
 //		se 0, então é o particionamento de Lomuto
 //		se for qualquer outra coisa, então é Hoare
 template <typename T>
-void quicksort(T* v, int i, int f, int tipo_particionamento){
+void quicksort(T* v, int i, int f){
 	int q;
 	if (i < f){
-		if (tipo_particionamento == 0) {q = particionar_lomuto(v,i,f);}
-
-		else {q = particionar_hoare(v,i,f);}
+		q = particionar_lomuto(v,i,f);
 							
-		quicksort(v,i,q-1, tipo_particionamento);
-		quicksort(v,q+1,f, tipo_particionamento);
+		quicksort(v,i,q-1);
+		quicksort(v,q+1,f);
 	}
 }
 
 
 int main(){
 	int v[] = {6,2,4,1};
-	int v_copia[] =  {6,2,4,1};
 
 	imprimir_vetor<int>(v,4);
 
 	cout << "Depois de ordenar o vetor (particionamento de Lomuto):\n";
 
-	quicksort<int>(v,0,3,0);
+	quicksort<int>(v,0,3);
 
 	imprimir_vetor<int>(v,4);
 	
-	cout << "Depois de ordenar o vetor (particionamento de Hoare):\n";
-
-	quicksort<int>(v_copia,0,3,1);
-
-	imprimir_vetor<int>(v_copia,4);
 }
