@@ -1,8 +1,22 @@
 #include <iostream>
 #include <chrono>
+#include <random>
 
 using namespace std;
 using namespace chrono;
+
+class MeuGerador{
+	random_device disp_aleat;
+	mt19937 gerador;
+	uniform_int_distribution<int> distr;
+
+	public:
+
+	MeuGerador(int d): gerador{ disp_aleat()}, distr(0,d) {}
+
+	int operator() () {return distr(gerador);}
+
+};
 
 //Funções utéis para todos as funções de ordenação
 template <typename T>
@@ -85,7 +99,10 @@ void merge (T *v, int i, int p, int f){
 	int n1 = p - i + 1;
 	int n2 = f - p;
 
-	int l[n1], m[n2];
+	T *l, *m;
+	
+	l = new T[n1];
+	m = new T[n2];
 
 	for (int x = 0; x < n1; x++) l[x] = v[i + x];
 	for (int y = 0; y < n2; y++) m[y] = v[p + 1 + y];
@@ -117,25 +134,19 @@ void merge (T *v, int i, int p, int f){
 	while(y < n2){
 		v[k++] = m[y++];
 	}
-
+	
+	delete[] l;
+	delete[] m;
 }
 
 template <typename T>
 void mergesort_original(T*v, int i, int f){
 
 	if (i < f){
-		
-		if (f-i+1 <= 100){
-			insertionsort(v,i,f);
-		}
-
-		else{
-		cout << "vim até aqui\n";
-			int q = (i+f)/2;
-			mergesort_original(v, i, q);
-			mergesort_original(v, q+1, f);
-			merge(v, i, q, f);
-		}
+		int q = (i+f)/2;
+		mergesort_original(v, i, q);
+		mergesort_original(v, q+1, f);
+		merge(v, i, q, f);
 	}
 }
 
@@ -145,7 +156,7 @@ void mergesort(T*v, int n){
 }
 
 //IMPLEMENTAÇÂO DO QUICKSORT E SUAS FUNÇÔES AUXILIARES
-int pivo(int i, int f){ return i;}
+int pivo(int i, int f ){return i + (f*0);}
 
 template <typename T>
 int particionar_lomuto(T* v, int i, int f){
@@ -162,31 +173,54 @@ int particionar_lomuto(T* v, int i, int f){
 	return j;
 }
 
-//quicksort modificado com insertionsort
 template <typename T>
-void quicksort_original(T* v, int i, int f){
+int particionar_lomuto_aleatorio(T* v, int i, int f, MeuGerador &g){
+	int j = g();
+
+	for(int k = i+1; k <= f; k++){
+		if (v[k] < v[i]){
+			trocar(v,++j,k);
+		}
+	}
+
+	trocar(v,j,i);
+	
+	return j;
+}
+
+//QUICKSORT COM PONTO FIXO E ALEATORIO
+template <typename T>
+void quicksort_original_fixo(T* v, int i, int f){
 	int q;
 	if (i < f){
-
-		if(f-i+1 <= 100){
-			insertionsort(v,i,f);
-		}
-
-		else{
-			q = particionar_lomuto(v,i,f);
-								
-			quicksort_original(v,i,q-1);
-			quicksort_original(v,q+1,f);
-		}
+		q = particionar_lomuto(v,i,f);
+							
+		quicksort_original_fixo(v,i,q-1);
+		quicksort_original_fixo(v,q+1,f);
+		
 	}
 }
 
 template <typename T>
-void quicksort(T* v, int n){
-	quicksort_original(v,0,n-1);
+void quicksort_fixo(T* v, int n){
+	quicksort_original_fixo(v,0,n-1);
 }
 
+template <typename T>
+void quicksort_original_aleatorio(T* v, int i, int f, MeuGerador &g){
+	int q;
+	if (i < f){
+		q = particionar_lomuto_aleatorio(v,i,f,g);
+							
+		quicksort_original_aleatorio(v,i,q-1,g);
+		quicksort_original_aleatorio(v,q+1,f,g);
+	}
+}
 
+template <typename T>
+void quicksort_aleatorio(T* v, int n, MeuGerador &g){
+	quicksort_original_aleatorio(v,0,n-1,g);
+}
 //IMPLEMENTAÇÂO DO INTROSORT
 int log(int n){
 	int cont = 0;
@@ -201,6 +235,28 @@ int log(int n){
 
 template <typename T>
 void introsort_original(T* v, int i, int f, int limite){
+	int q;
+	if (i < f){
+		if(limite  == 0){
+			mergesort_original(v,i,f);
+		}
+
+		else{
+			q = particionar_lomuto(v,i,f);
+								
+			introsort_original(v,i,q-1,limite-1);
+			introsort_original(v,q+1,f,limite-1);
+		}
+	}
+}
+
+template <typename T>
+void introsort(T* v, int n){
+	introsort_original(v,0,n-1, log(n) * 2);
+}
+
+template <typename T>
+void introsort_original_insertion(T* v, int i, int f, int limite){
 	int q;
 	if (i < f){
 	
@@ -224,18 +280,15 @@ void introsort_original(T* v, int i, int f, int limite){
 }
 
 template <typename T>
-void introsort(T* v, int n){
-	introsort_original(v,0,n-1, log(n) * 2);
+void introsort_insertion(T* v, int n){
+	introsort_original_insertion(v,0,n-1, log(n) * 2);
 }
-
-
-
 //FUNCAO PARA RECEBER UMA ORDENAÇÂO E MEDIR O TEMPO DElA
+//Vou ter que medir o tempo do quicksort aleatorio sem ser nessa função
+//ele não se encaixa no ponteiro ordenacao
 template <typename T>
-double medir_tempo(void (*ordenacao) (T*, int), T* v, T* aux, int n){
+double medir_tempo(void (*ordenacao) (T*, int), T* aux, int n){
 	
-	copiar(v,aux,n);
-
 	auto inicio = steady_clock::now();
 
 	ordenacao(aux,n);
@@ -247,26 +300,88 @@ double medir_tempo(void (*ordenacao) (T*, int), T* v, T* aux, int n){
 	return d.count();
 }
 
-//Gerando instancia de pior caso para Pivo
+//GERANDO INSTANCIAS 
 template <typename T>
 bool gerar_pior_caso (T *v, int n){
-	
+	for(int i = 0; i < n; i++) v[i] = i;
+	return false;	
+}
+
+void instancia_pior_caso(int *v, int n){
+	gerar_pior_caso<int>(v,n);
+}
+
+void instancia_aleatoria(int *v, int n, MeuGerador &g){
+	for(int i = 0; i < n; i++) v[i] = g();
+}
+
+void instancia_ordem_crescente(int *v, int n){
+	for(int i = 0; i < n; i++) v[i] = i;
+}
+
+void instancia_ordem_decrescente(int *v, int n){
+	for(int i = 0; i < n; i++) v[i] = n-i;
 }
 
 //MAIN DO PROGRAMA
-int main(){
-	int v[] = {1,2,3,4};
-	int *u;
-	u = new int[4];
+int main(int narg, char* arg[]){
 	
-	cout << "Quicksort: ";
-	cout << medir_tempo(quicksort,v,u,4) << " segundos \n";	
+	char tipo_instancia = arg[narg-3][0];
+	int n = atoi(arg[narg-2]);
+	int numero_instancias = atoi(arg[narg-1]);
 
-	cout << "heapsort: ";
-	cout << medir_tempo(heapsort,v,u,4) << " segundos \n";	
+	double tempo_heap = 0.0;
+	double tempo_quick_fixo = 0.0;
+	double tempo_quick_aleatorio = 0.0;
+	double tempo_introsort = 0.0;
+	double tempo_introsort_insertion = 0.0;
 	
-	cout << "introsort: ";
-	cout << medir_tempo(introsort,v,u,4) << "segundos \n";
+	int *v, *aux;
+	v = new int[n];
+	aux = new int[n];
+	MeuGerador g(n);
+	
+	for(int i = 0; i < numero_instancias; ++i){
+		if(tipo_instancia == 'A') instancia_aleatoria(v,n,g);
+		if(tipo_instancia == 'C') instancia_ordem_crescente(v,n);
+		if(tipo_instancia == 'D') instancia_ordem_decrescente(v,n);
+		if(tipo_instancia == 'P') instancia_pior_caso(v,n);
+		
+		copiar(v,aux,n);
+		tempo_heap += medir_tempo(heapsort,aux,n);
 
-	delete[] u;
+		copiar(v,aux,n);
+		tempo_quick_fixo += medir_tempo(quicksort_fixo,aux,n);
+
+		copiar(v,aux,n);
+		tempo_introsort += medir_tempo(introsort,aux,n);
+
+		copiar(v,aux,n);
+		tempo_introsort += medir_tempo(introsort_insertion, aux, n);
+
+		copiar(v,aux,n);
+		auto inicio = steady_clock::now();
+		quicksort_aleatorio(aux,n,g);
+		auto fim = steady_clock::now();
+
+		duration<double> d = fim-inicio;
+
+		tempo_quick_aleatorio += d.count();	
+	}
+
+	
+	cout << "MEDINDO TEMPO DAS ORDENAÇÕES";
+	cout << "- Tipo de instancia: " << tipo_instancia << "\n";
+	cout << "- Tamanho do vetor: " << n << "\n";
+	cout << "- Número de instancias: " << numero_instancias << "\n\n";
+
+	cout << "--> Tempos dos algoritmos \n";
+	cout << "Heaposort: " << tempo_heap << "\n";
+	cout << "Quicksort fixo: " << tempo_quick_fixo << "\n";
+	cout << "Quicksort aleatorio: " << tempo_quick_aleatorio << "\n";
+	cout << "Introsort sem insertion: " << tempo_introsort << "\n";
+	cout << "Introsort com insertion: " << tempo_introsort_insertion << "\n";
+
+	delete[] v;
+	delete[] aux;
 }
