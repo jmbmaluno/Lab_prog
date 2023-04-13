@@ -8,13 +8,15 @@ using namespace chrono;
 class MeuGerador{
 	random_device disp_aleat;
 	mt19937 gerador;
-	uniform_int_distribution<int> distr;
 
 	public:
 
-	MeuGerador(int d): gerador{ disp_aleat()}, distr(0,d) {}
+	MeuGerador(): gerador{disp_aleat()}{}
 
-	int operator() () {return distr(gerador);}
+	int operator() (int i, int f) { 
+		uniform_int_distribution distr(i,f); 
+		return distr(gerador);
+	}
 
 };
 
@@ -175,7 +177,7 @@ int particionar_lomuto(T* v, int i, int f){
 
 template <typename T>
 int particionar_lomuto_aleatorio(T* v, int i, int f, MeuGerador &g){
-	int j = g();
+	int j = g(i,f);
 
 	for(int k = i+1; k <= f; k++){
 		if (v[k] < v[i]){
@@ -312,7 +314,7 @@ void instancia_pior_caso(int *v, int n){
 }
 
 void instancia_aleatoria(int *v, int n, MeuGerador &g){
-	for(int i = 0; i < n; i++) v[i] = g();
+	for(int i = 0; i < n; i++) v[i] = g(0,n);
 }
 
 void instancia_ordem_crescente(int *v, int n){
@@ -339,7 +341,7 @@ int main(int narg, char* arg[]){
 	int *v, *aux;
 	v = new int[n];
 	aux = new int[n];
-	MeuGerador g(n);
+	MeuGerador g;
 	
 	for(int i = 0; i < numero_instancias; ++i){
 		if(tipo_instancia == 'A') instancia_aleatoria(v,n,g);
@@ -357,7 +359,7 @@ int main(int narg, char* arg[]){
 		tempo_introsort += medir_tempo(introsort,aux,n);
 
 		copiar(v,aux,n);
-		tempo_introsort += medir_tempo(introsort_insertion, aux, n);
+		tempo_introsort_insertion += medir_tempo(introsort_insertion, aux, n);
 
 		copiar(v,aux,n);
 		auto inicio = steady_clock::now();
