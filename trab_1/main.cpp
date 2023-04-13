@@ -158,7 +158,7 @@ void mergesort(T*v, int n){
 }
 
 //IMPLEMENTAÇÂO DO QUICKSORT E SUAS FUNÇÔES AUXILIARES
-int pivo(int i, int f ){return i + (f*0);}
+int pivo(int i, int f ){return i + f*0;}
 
 template <typename T>
 int particionar_lomuto(T* v, int i, int f){
@@ -303,10 +303,35 @@ double medir_tempo(void (*ordenacao) (T*, int), T* aux, int n){
 }
 
 //GERANDO INSTANCIAS 
+
+template <typename T>
+void pior_caso(T* v, int i, int f){
+	if(i < f){
+		int k = pivo(i,f);
+
+		trocar(v,i,k);
+
+		pior_caso(v,i+1,f);
+	}
+	
+}
+
 template <typename T>
 bool gerar_pior_caso (T *v, int n){
-	for(int i = 0; i < n; i++) v[i] = i;
-	return false;	
+	T* aux;
+	aux = new T[n];
+	
+	for(int i = 0; i < n; i++) aux[i] = i;
+
+	pior_caso(aux,0,n);
+	
+	for(int i = 0; i < n; i++){
+		v[aux[i]] = i+1;
+	}
+
+	delete[] aux;	
+
+	return true;	
 }
 
 void instancia_pior_caso(int *v, int n){
@@ -354,6 +379,7 @@ int main(int narg, char* arg[]){
 
 		copiar(v,aux,n);
 		tempo_quick_fixo += medir_tempo(quicksort_fixo,aux,n);
+		
 
 		copiar(v,aux,n);
 		tempo_introsort += medir_tempo(introsort,aux,n);
