@@ -1,4 +1,7 @@
-#include "algoritmos.hpp"
+#include "algoritmos_busca.hpp"
+#include <iostream>
+
+using namespace std;
 
 int tamanho_string(const char* t){
     int n = 0;
@@ -15,13 +18,15 @@ void forca_bruta(const char* p, const char* t, int* o){
     int n = tamanho_string(t);
     int m = tamanho_string(p);
 
-    for(int i = 0; i <= m-n; i++){
+    
+    for(int i = 0; i <= n-m; i++){
         
         for(j = 0; j < n; j++){
             if (t[i+j] != p[j]) break;
         }
 
-        if(j == n) o[cont++] = i;
+       if(j == m) o[cont++] = i;
     }
 
+    o[cont] = -1;
 }

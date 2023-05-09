@@ -3,6 +3,6 @@
 
 int tamanho_string(const char* t);
 
-void forca_bruta(const char*, const char*, int*);
+void forca_bruta(const char* p, const char* t, int* o);
 
 #endif
