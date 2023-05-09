@@ -8,7 +8,7 @@ int tamanho_string(const char* t){
 }
 
 
-void forca_bruta(const char* p, const char* t, int* o){
+void forca_bruta(const char* p, const char* t, int* o){ 
     int j;
     int cont = 0;
     
