@@ -1,6 +1,5 @@
 #include "instancias.hpp"
 #include "auxiliares.hpp"
-#include "instancia_real.hpp"
 
 const char letra_aleatoria(const char l){
     MeuGerador g;
@@ -19,7 +18,3 @@ char* string_aleatoria(int n, const char l){
 
     return t;
 }
-
-const char* padrao_real(int x) {return Padroes_Palavras[x];}
-
-const char* texto_real() {return Texto_Livros;}
