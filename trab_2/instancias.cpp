@@ -1,10 +1,10 @@
 #include "instancias.hpp"
 #include "auxiliares.hpp"
 
-const char letra_aleatoria(const char l){
-    MeuGerador g;
-    int x = l - 'a';
+MeuGerador g;
 
+char letra_aleatoria(const char l){
+    int x = l - 'a';
     return 'a' + g(0,x);
 }
 

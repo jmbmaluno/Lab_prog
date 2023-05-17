@@ -5,7 +5,7 @@
 using namespace std;
 using namespace chrono;
 
-double medir_tempo(void (*busca_string) (const char *, const char *, int* ), const char * p, const char * t,  int* o){
+double medir_tempo(bool (*busca_string) (const char *, const char *, int* ), const char * p, const char * t,  int* o){
 
 	auto inicio = steady_clock::now();
 
