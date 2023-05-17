@@ -1,0 +1,1 @@
+g++ -Wall -Wextra -std=c++17 -pedantic auxiliares.cpp instancias.cpp algoritmos_busca.cpp medir_tempo.cpp main.cpp -o programa
