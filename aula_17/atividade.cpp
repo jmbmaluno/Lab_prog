@@ -13,6 +13,41 @@ struct nohheap{
     int peso;
 };
 
+void trocar(nohheap* heap, int i, int j){
+    nohheap aux;
+
+    aux = heap[i];
+    heap[i] = heap[j];
+    heap[j] = aux;
+}
+
+void heapify(nohheap* heap, int n, int i){
+    int menor = i;
+
+    int esq = 2 * i + 1;
+    int dir = 2 * i + 2;
+
+    if(esq < n && heap[esq].peso < heap[menor].peso){
+        menor = esq;
+    }
+
+    if(dir < n && heap[dir].peso < heap[menor].peso){
+        menor = dir;
+    }
+
+    if(menor != i){
+        trocar(heap, i, menor);
+
+        heapify(heap, n, menor);
+    }
+}
+
+void criar_heap_minimo(nohheap* heap, int n){
+    for(int i = (n/2) - 1; i >=0; i--){
+        heapify(heap, n, i);
+    }
+}
+
 int main(){
     int* ocorrencia_bytes = new int[256];
     int n = 0;
@@ -65,6 +100,8 @@ int main(){
         }
     }
 
+    criar_heap_minimo(heap,n);
+    
     cout << "Heap\n";
 
     for(int i = 0; i < n; i++){
