@@ -157,7 +157,15 @@ int main(){
 
     else{
         saida.write((char *)&n, sizeof(int));
+        int i = 0;
         
+        while(ocorrencia_bytes[i] == 0){
+            i++;
+        }
+        
+        saida.write((char *)&n, sizeof(int));
+        saida.put((unsigned char)i);
+        cout << ((unsigned char )i) << "\n";
     }
 
 
