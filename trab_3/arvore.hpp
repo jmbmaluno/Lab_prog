@@ -21,27 +21,24 @@ void gerar_codigo(vector<char>* codigos, nohhuf* arvore, int pos, int n, vector<
     }
 }
 
-int decodificar(vector<char> l, vector <char>* codigos){
-    for(int i = 0; i < 256; i++){
-        if(codigos[i].size() > 0 && l == codigos[i]) return i;
+vector<char> decodificar(nohhuf* arvore, int n, vector<char> texto, int qtde_letras){
+    vector<char> saida;
+    int i = n*2 - 2;
+
+    for(int j = 0; j < (int)texto.size(); ++j){
+        if(qtde_letras > 0){
+            if(texto[j] == '0') i = arvore[i].esq;
+            else i = arvore[i].dir;
+
+            if(i < n){
+                saida.push_back(arvore[i].esq);
+                i = n*2-2;
+                qtde_letras--;
+            }
+        }
     }
 
-    return -1;
-}
-
-int decodificar2(vector<char> l, nohhuf* arvore, int x){
-    int n = (x+2)/2 - 1;
-    int i = 0;
-
-    while(x > n && i < (int)l.size()){
-        if(l[i] == '0') x = arvore[x].esq;
-        else x = arvore[x].dir;
-        i++;
-    }
-
-    if(i == (int)l.size()) return -1;
-
-    return arvore[x].esq;
+    return saida;
 }
 
 #endif

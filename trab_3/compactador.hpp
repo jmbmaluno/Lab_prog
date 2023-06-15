@@ -191,21 +191,19 @@ class Compactador{
                     }
                 }
 
-                vector<char> c;
 
                 int qtde_letras;
 
                 arq.read((char *)&qtde_letras, sizeof(int));
                 
+
                 unsigned char byte = arq.get();
-                vector <char> letra;
+                vector <char> texto;
                 int bits_lidos = 0;
-                int x;
-                
-                while(!arq.eof() && qtde_letras > 0){
-                    
-                    if(byte >= 128) letra.push_back('1');
-                    else letra.push_back('0');
+
+                while(!arq.eof()){
+                    if(byte >= 128) texto.push_back('1');
+                    else texto.push_back('0');
                     bits_lidos++;
 
                     if(bits_lidos == 8){
@@ -213,45 +211,17 @@ class Compactador{
                         byte = arq.get();
                     }
                     
-                    else {byte = byte << 1;}
-                    x = decodificar2(letra, arvore, 2*n-2);
-
-                    if(x != -1){
-                        saida.put((char)x);
-                        qtde_letras--;
-                        letra = {};
-                    }
-
+                    else byte = byte << 1;
                 }
 
-                /*
-                for(int i = 0; i < qtde_letras; i++){
-                    x = decodificar2(letra, arvore, 2*n-2);
-                   
-                    while(x == -1){
+                vector <char> texto_decodificado;
+                texto_decodificado = decodificar(arvore, n, texto, qtde_letras);
 
-                        if(byte >= 128) letra.push_back('1');
-                        else letra.push_back('0');
-
-                        bits_lidos++;
-                        if(bits_lidos == 8){
-                            bits_lidos = 0;
-                            byte = arq.get();
-                        }
-                        else byte = byte << 1;
-
-                        x = decodificar2(letra,arvore, 2*n-2);
-
-                    }
-
-                    saida.put((char)x);
-                    letra = {};
-
-                }*/
-
+                for(int i = 0; i < (int)texto_decodificado.size(); i++){
+                    saida.put(texto_decodificado[i]);
+                }
+                
                 delete[] arvore;
-                cout << "Descompactacao finalizada\n";
-
             }
         }
 };
