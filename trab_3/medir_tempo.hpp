@@ -5,7 +5,8 @@
 
 using namespace std;
 using namespace chrono;
-//VER COMO FAZER ISSO AQUI
+
+//Medindo o tempo de um método do Compactador
 double medir_tempo(void (Compactador::*acao)(), Compactador c){
     auto inicio = steady_clock::now();
 

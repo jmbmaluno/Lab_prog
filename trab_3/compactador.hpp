@@ -11,12 +11,14 @@ class Compactador{
     string out;
 
     public:
+        //Construtor com arquivo de saida e entrada
         Compactador(string e, string o){
             
             entrada = e;
             out = o;
         }
 
+        //Compactação
         void comp(){
             int* ocorrencia_bytes = new int[256];
             
@@ -24,6 +26,7 @@ class Compactador{
                 ocorrencia_bytes[i] = 0;
             }
 
+            //Abrindo os arquivo de entrada e saida
             ifstream arq (entrada.data(), std::ios_base::in | std::ios_base::binary);
             ofstream saida(out, std::ios_base::binary | std::ios_base::out);
 
@@ -165,9 +168,11 @@ class Compactador{
             ofstream saida(out, std::ios_base::binary | std::ios_base::out);
 
             arq.read((char *)&n, sizeof(int));
-
+            
+            //Caso de n = 0
             if(arq.eof()){cout << "Descompactacao finalizada!\n"; return;}
             
+            //Caso do n = 1
             if (n == 1){
                 arq.read((char*)&qtde_ocorrencias, sizeof(int));
                 unsigned char letra = arq.get();
